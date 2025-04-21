@@ -1,0 +1,38 @@
+digraph gvhd_timeline {
+  rankdir=LR;
+  fontname="Helvetica"
+  node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=10 fillcolor="#e6f0ff"];
+
+  subgraph cluster_setup {
+    label="Setup Phase (0–0.25 hr)";
+    style=dashed;
+    infra [label="Terraform: Provision EC2, S3", width=2];
+  }
+
+  subgraph cluster_processing {
+    label="Data Processing (0.25–10.25 hr)";
+    style=solid;
+    qiime [label="QIIME2 (800 samples, 20 parallel EC2)", width=4];
+    feature [label="Export Feature Tables", width=1.5];
+  }
+
+  subgraph cluster_analysis {
+    label="Modeling & Cleanup (10.25–12 hr)";
+    style=dotted;
+    ml [label="Model Training & Evaluation", width=2];
+    cleanup [label="Download + Teardown", width=1.5];
+  }
+
+  // Flow arrows
+  infra -> qiime;
+  qiime -> feature;
+  feature -> ml;
+  ml -> cleanup;
+
+  // Optional timeline marker nodes (for visual spacing)
+  start [shape=point width=0 label=""];
+  end [shape=point width=0 label=""];
+  start -> infra [style=invis];
+  cleanup -> end [style=invis];
+}
+
